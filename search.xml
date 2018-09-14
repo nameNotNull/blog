@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+    
+    <entry>
+      <title>yaf的单元测试</title>
+      <link href="/blog/2018/08/17/unit-test/"/>
+      <url>/blog/2018/08/17/unit-test/</url>
+      <content type="html"><![CDATA[<p>单元测试的目的是为了验证系统中某一部分逻辑的功能是否正确。在多人开发的过程中，各个功能模块可能会互相调用，编写单元测试和执行单元测试能有效提高代码的健壮性、可靠性。<br>单元测试能够屏蔽其他模块的依赖，mock可以解决其他模块的依赖问题。<br>PHP的单元测试实际项目很少有人有耐心去写，今天总结一下，简单的单元测试其实很容易编写，由于yaf的自动加载的问题比较麻烦，今天重点记录yaf的单元测试常用写法。</p><h2 id="PHPUnit"><a href="#PHPUnit" class="headerlink" title="PHPUnit"></a>PHPUnit</h2><p>PHPUnit是php的一个测试框架，封装了大量测试php的类和方法，这里我打算用这个组件进行单元测试。<br>PHPUnit可以由composer进行安装，<br>在yaf目录中配置composer.json文件</p><pre><code class="$xslt">&quot;require&quot;: {    &quot;phpunit/phpunit&quot;: &quot;6.0.8&quot;    }</code></pre><p>执行composer install即可</p><p>PHPUnit 的测试类继承于 TestCase 类，该类的父类实现了断言assertEquals和模拟数据createMock</p><p>断言就是验证某个接口或者对象的值是否和预期一致，执行单元测试命令时，在结果里会显示断言的数量以及断言验证的结果正确数</p><pre><code class="断言">$this-&gt;assertEquals(1,XX_Model::getInstance()-&gt;getListByUserId(&#39;123&#39;));</code></pre><p>模拟数据就是解决其他模块的依赖，生成mock数据</p><pre><code class="mock">$stub = $this-&gt;createMock(XX_Model::class);$stub-&gt;method(&#39;get&#39;)-&gt;willReturn(3);         $this-&gt;assertEquals(3,$stub-&gt;get(1));</code></pre><p>上述stub的get方法就必然返回3，更复杂的依赖解决参见 more info</p><p>在yaf项目目录下新建一个test目录，创建单元测试文件test.php</p><p>创建测试类，测试类的成员方法必须是以test开头，执行单元测试命令时，会顺序执行这些test方法</p><p>yaf的自动加载需要配合yaf的bootstrap指定加载方法</p><pre><code>$application = new Yaf\Application(ROOT_PATH . &quot;/config/application.ini&quot;,&#39;develop&#39;);$application-&gt;bootstrap();Yaf\Registry::set(&#39;application&#39;, $application);</code></pre><p>整个单元测试的样例如下</p><pre><code>&lt;?php/** * 1、composer 安装Monolog日志扩展，安装phpunit单元测试扩展包 * 2、引入autoload.php文件 * 3、测试案例 * *// *///namespace App\tests;ini_set(&#39;yaf.name_separator&#39;, &#39;_&#39;);require_once __DIR__ . &#39;/../vendor/autoload.php&#39;;define(&quot;ROOT_PATH&quot;, dirname(__DIR__) . &quot;/&quot;);use Monolog\Logger;use Monolog\Handler\StreamHandler;use PHPUnit\Framework\TestCase;use Yaf\Bootstrap_Abstract;use Yaf\Dispatcher;use Yaf\Loader;use Yaf\Registry;define(&#39;APPLICATION_PATH&#39;, ROOT_PATH . &#39;/application&#39;);class YafTest extends TestCase{    public function testSearch()    {        $application = new Yaf\Application(ROOT_PATH . &quot;/config/application.ini&quot;,&#39;develop&#39;);        $application-&gt;bootstrap();        Yaf\Registry::set(&#39;application&#39;, $application);        $this-&gt;assertEquals(1,XX_Model::getInstance()-&gt;getListByUserId(&#39;123&#39;));        $stub = $this-&gt;createMock(XX_Model::class);        $stub-&gt;method(&#39;get&#39;)-&gt;willReturn(3);                     //2        $this-&gt;assertEquals(3,$stub-&gt;get(1));    }    public function Log()    {        // create a log channel        $log = new Logger(&#39;Tester&#39;);        $log-&gt;pushHandler(new StreamHandler(ROOT_PATH . &#39;storage/logs/app.log&#39;, Logger::WARNING));        return $log;    }}</code></pre><p>执行单元测试</p><pre><code class="$xslt">php ./vendor/bin/phpunit tests/test.php </code></pre><p>实际效果</p><p><img src="/blog/resource/img/phpunit.png" alt="单元测试"></p><p>额外说明一下，php的xdebug扩展和phpunit是不兼容的，执行单元测试，需要关闭xdebug扩展。</p><p>More info: <a href="http://www.phpunit.cn/manual/current/zh_cn/writing-tests-for-phpunit.html#writing-tests-for-phpunit.test-dependencies" target="_blank" rel="noopener">phpunit依赖解决</a></p>]]></content>
+      
+      <categories>
+          
+          <category> php </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> PHP </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>hexo使用gitalk</title>
+      <link href="/blog/2018/08/02/comment-gitalk/"/>
+      <url>/blog/2018/08/02/comment-gitalk/</url>
+      <content type="html"><![CDATA[<h2 id="hexo评论插件gitalk"><a href="#hexo评论插件gitalk" class="headerlink" title="hexo评论插件gitalk"></a>hexo评论插件gitalk</h2><p>在博客上增加了一个评论插件，gitalk. 基于github的issue做的评论<br>原理就是github以app授权的方式让博客拿到repo的权限，页面在加载时，提示用户登录github，<br>对某个issue进行评论列表加载、评论回复、点赞等操作。</p><p>More info: <a href="https://gitalk.github.io/" target="_blank" rel="noopener">gitalk</a></p><h3 id="在github上申请应用授权"><a href="#在github上申请应用授权" class="headerlink" title="在github上申请应用授权"></a>在github上申请应用授权</h3><p><a href="https://github.com/settings/applications/new" target="_blank" rel="noopener">授权地址</a></p><p><img src="/blog/resource/img/auth.png" alt="授权页面"></p><p>Application name－－应用名称,填写自己可以随意增加issue的repo名字</p><p>Homepage URL－－如上图可以填本地地址进行测试,127.0.0.1:port/xx/xx</p><p>Application description－－应用描述,随意填</p><p>Authorization callback URL－－发布到线上的博客地址,github在验证登录后会回调返回登录授权的access_token，后续评论、点赞都是通过access_token去取github某个issue的数据</p><h3 id="配置hexo的文件themes-next-layout-third-party-comments-gitalk-swig"><a href="#配置hexo的文件themes-next-layout-third-party-comments-gitalk-swig" class="headerlink" title="配置hexo的文件themes/next/layout/_third-party/comments/gitalk.swig"></a>配置hexo的文件themes/next/layout/_third-party/comments/gitalk.swig</h3><pre><code>{% if page.comments && theme.gitalk.enable %}  <link rel="stylesheet" href="/blog/css/gitalk.css">  <script src="/blog/js/gitalk.min.js"></script>   <script type="text/javascript">        var gitalk = new Gitalk({          clientID: '{{ theme.gitalk.ClientID }}',          clientSecret: '{{ theme.gitalk.ClientSecret }}',          repo: '{{ theme.gitalk.repo }}',          owner: '{{ theme.gitalk.githubID }}',          admin: ['{{ theme.gitalk.adminUser }}'],          id: location.pathname,          distractionFreeMode: '{{ theme.gitalk.distractionFreeMode }}'        })        gitalk.render('gitalk-container')       </script>{% endif %}</code></pre><p>实际就是调用gitalk封装的js初始化github的issue</p><h3 id="配置themes-next-config-yml"><a href="#配置themes-next-config-yml" class="headerlink" title="配置themes/next/_config.yml"></a>配置themes/next/_config.yml</h3><p>最后一行后添加ClientID 和ClientSecret的配置</p><pre><code>gitalk:  enable: true  githubID: nameNotNull  repo: blog  owner: nameNotNull  admin: nameNotNull  ClientID: xx  ClientSecret: xxx  adminUser: nameNotNull  distractionFreeMode: true</code></pre><h3 id="配置themes-next-layout-partials-comments-swig"><a href="#配置themes-next-layout-partials-comments-swig" class="headerlink" title="配置themes/next/layout/_partials/comments.swig"></a>配置themes/next/layout/_partials/comments.swig</h3><p>最后一个endif前添加评论页面样式</p><pre><code>  {% elseif theme.valine.appid and theme.valine.appkey %}    &lt;div class=&quot;comments&quot; id=&quot;comments&quot;&gt;    &lt;/div&gt;  {% elseif theme.gitalk.enable %}       &lt;div id=&quot;gitalk-container&quot;&gt;&lt;/div&gt;  {% endif %}{% endif %}</code></pre><h3 id="配置themes-next-source-css-common-components-third-party-third-party-styl"><a href="#配置themes-next-source-css-common-components-third-party-third-party-styl" class="headerlink" title="配置themes/next/source/css/_common/components/third-party/third-party.styl"></a>配置themes/next/source/css/_common/components/third-party/third-party.styl</h3><p>引入gitalk的配置，最后一行添加</p><pre><code>@import &quot;gitalk&quot;;</code></pre><p>至此，则将gitalk的js加载到页面，用户点击文章详情页，默认唤起github的授权登录，js跳转授权页面，成功登录后即可发布评论（实际是发布issue :smile:）</p>]]></content>
+      
+      <categories>
+          
+          <category> 工具 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> gitalk </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>API命名规范</title>
+      <link href="/blog/2018/08/02/api-norm/"/>
+      <url>/blog/2018/08/02/api-norm/</url>
+      <content type="html"><![CDATA[<h3 id="基本格式"><a href="#基本格式" class="headerlink" title="基本格式"></a>基本格式</h3><p>protocol://hostname[:port]/path/action.type[?query]</p><p>协议://主机名[:端口]/ 路径/操作.返回类型:[参数]</p><p>通用命名<br>不要关键字作为名称</p><p>为了避免增删改查等高频操作使用不同词汇从而增加了沟通和维护的成本，对类似含义的词汇进行合并。</p><p>参考了使用频率较高的最为优先选择。</p><ul><li><p>create</p></li><li><p>remove</p></li><li><p>modify</p></li><li><p>search<br>以列表方式展现</p></li><li><p>detail<br>以详情方式展现</p></li><li><p>summary<br>以概要方式展现</p></li><li><p>suggestion<br>搜索提示</p></li></ul>]]></content>
+      
+      <categories>
+          
+          <category> php </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> api规范 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
+      <title>立个Flag</title>
+      <link href="/blog/2018/08/01/hello-world/"/>
+      <url>/blog/2018/08/01/hello-world/</url>
+      <content type="html"><![CDATA[<p>正好最近有心情，重新把自己的博客搭起来，继续写一些有价值的文章，坚持下去</p><h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>打算写一个系列，总结一些初级程序员经常犯的错误，系统总结一下，如何避免和提升。</p><h3 id="初级程序员经常犯的错误"><a href="#初级程序员经常犯的错误" class="headerlink" title="初级程序员经常犯的错误"></a>初级程序员经常犯的错误</h3><ul><li>命名不规范</li><li>日志不规范</li><li>拒绝写接口和假数据</li><li>不写单元测试</li><li>盲目集成</li><li>逻辑不清</li><li>不做方案 </li><li>不关注性能</li><li>害怕重构</li><li>做出来就好，不考虑优雅的方案</li><li>不考虑未来需求的变化</li><li>遇到问题的时候不会试错</li><li>不会写伪代码 </li><li>不做数据量的预估</li><li>提交代码不规范</li><li>不喜欢打</li><li>不遵守发布流程</li><li>不知道Bug修复的优先级</li><li>总喜欢手动修改线上代码</li><li>不做数据备份</li><li>不做自测</li><li>不尽力模仿真实数据，测试数据很随意</li><li>不抽取公共代码</li><li>不认真听需求讲解</li><li>不看验收标准</li><li>不主动推进项目进度</li></ul><p>More info: <a href="https://www.zhihu.com/question/33578621/answer/453835060" target="_blank" rel="noopener">初级程序员常见错误</a></p><h3 id="计划"><a href="#计划" class="headerlink" title="计划"></a>计划</h3><ul><li>命名的规范，代码的规范，参考PSR2,详见下一篇</li><li>单元测试一直没详细研究过，这次做个系统的研究</li><li>代码发布，git的使用小技巧</li></ul>]]></content>
+      
+      <categories>
+          
+          <category> 杂谈 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 计划 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+  
+  
+</search>
