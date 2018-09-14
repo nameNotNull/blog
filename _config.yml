@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: more
 subtitle:
 description:
 keywords:
-author: John Doe
+author: linode
 language:
 timezone:
 
@@ -38,11 +38,7 @@ render_drafts: false
 post_asset_folder: false
 relative_link: false
 future: true
-highlight:
-  enable: true
-  line_number: true
-  auto_detect: false
-  tab_replace:
+
   
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
@@ -70,12 +66,24 @@ time_format: HH:mm:ss
 per_page: 10
 pagination_dir: page
 
+highlight:
+  enable: false
+
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
+
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repository: git@github.com:nameNotNull/blog.git
+  branch: master
+

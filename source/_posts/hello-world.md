@@ -1,38 +1,53 @@
 ---
-title: Hello World
+title: 立个Flag
+date: 2018-08-01 11:06:02
+tags: 计划
+categories: 杂谈
 ---
-Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
+正好最近有心情，重新把自己的博客搭起来，继续写一些有价值的文章，坚持下去
 
-## Quick Start
+## 目标
+打算写一个系列，总结一些初级程序员经常犯的错误，系统总结一下，如何避免和提升。
 
-### Create a new post
+### 初级程序员经常犯的错误
 
-``` bash
-$ hexo new "My New Post"
-```
 
-More info: [Writing](https://hexo.io/docs/writing.html)
+- 命名不规范
+- 日志不规范
+- 拒绝写接口和假数据
+- 不写单元测试
+- 盲目集成
+- 逻辑不清
+- 不做方案 
+- 不关注性能
+- 害怕重构
+- 做出来就好，不考虑优雅的方案
+- 不考虑未来需求的变化
+- 遇到问题的时候不会试错
+- 不会写伪代码 
+- 不做数据量的预估
+- 提交代码不规范
+- 不喜欢打
+- 不遵守发布流程
+- 不知道Bug修复的优先级
+- 总喜欢手动修改线上代码
+- 不做数据备份
+- 不做自测
+- 不尽力模仿真实数据，测试数据很随意
+- 不抽取公共代码
+- 不认真听需求讲解
+- 不看验收标准
+- 不主动推进项目进度
 
-### Run server
 
-``` bash
-$ hexo server
-```
 
-More info: [Server](https://hexo.io/docs/server.html)
+More info: [初级程序员常见错误](https://www.zhihu.com/question/33578621/answer/453835060)
 
-### Generate static files
+### 计划
 
-``` bash
-$ hexo generate
-```
+- 命名的规范，代码的规范，参考PSR2,详见下一篇
+- 单元测试一直没详细研究过，这次做个系统的研究
+- 代码发布，git的使用小技巧
 
-More info: [Generating](https://hexo.io/docs/generating.html)
 
-### Deploy to remote sites
 
-``` bash
-$ hexo deploy
-```
-
-More info: [Deployment](https://hexo.io/docs/deployment.html)
